@@ -109,24 +109,53 @@ def calendario_create_api(request):
             'content_type': 'application/json',
             'required_fields': {
                 'title': 'string - Título de la cita',
-                'startTime': 'string - Hora de inicio (ISO 8601)',
-                'endTime': 'string - Hora de fin (ISO 8601)',
+                'appointmentStatus': 'string - Estado de la cita (confirmed, pending, cancelled)',
+                'assignedUserId': 'string - ID del usuario asignado',
                 'calendarId': 'string - ID del calendario',
-                'notes': 'string - Notas opcionales'
+                'locationId': 'string - ID de la ubicación',
+                'contactId': 'string - ID del contacto',
+                'startTime': 'string - Hora de inicio (ISO 8601)',
+                'endTime': 'string - Hora de fin (ISO 8601)'
             },
             'example': {
-                'title': 'Cita de prueba',
-                'startTime': '2024-01-15T10:00:00Z',
-                'endTime': '2024-01-15T11:00:00Z',
-                'calendarId': '2Xm67bMv2DpdoL8LQQi8',
-                'notes': 'Notas opcionales'
-            },
-            'note': 'El campo locationId se agrega automáticamente'
+                'title': 'Evento Diego',
+                'appointmentStatus': 'confirmed',
+                'assignedUserId': 'QwJxUVksqilzJUDZf7Ct',
+                'calendarId': 'S0qwWg5ToQWFxzowt4F1',
+                'locationId': 'r3UrTfNuQviYjKT9vfVz',
+                'contactId': 'tq9Ecyu6Cpng1UkAJ5so',
+                'startTime': '2025-09-17T13:00:00-05:00',
+                'endTime': '2025-09-17T14:00:00-05:00'
+            }
         })
     
     elif request.method == 'POST':
         try:
             data = request.data
+            
+            # Validar campos requeridos
+            required_fields = [
+                'title', 'appointmentStatus', 'assignedUserId', 
+                'calendarId', 'locationId', 'contactId', 
+                'startTime', 'endTime'
+            ]
+            
+            missing_fields = [field for field in required_fields if field not in data or not data[field]]
+            if missing_fields:
+                return Response({
+                    'error': 'Missing required fields',
+                    'missing_fields': missing_fields,
+                    'required_fields': required_fields
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validar formato de appointmentStatus
+            valid_statuses = ['confirmed', 'pending', 'cancelled']
+            if data['appointmentStatus'] not in valid_statuses:
+                return Response({
+                    'error': 'Invalid appointmentStatus',
+                    'valid_statuses': valid_statuses,
+                    'received': data['appointmentStatus']
+                }, status=status.HTTP_400_BAD_REQUEST)
             
             # URL para crear citas - probando con diferentes endpoints
             # Primero intentamos con el endpoint de eventos
@@ -136,14 +165,23 @@ def calendario_create_api(request):
             headers = get_headers()
             headers['Version'] = '2021-07-28'
             
-            # Agregar locationId a los datos
-            data['locationId'] = settings.GHL_LOCATION_ID
+            # Preparar datos para envío (no sobrescribir locationId si ya viene en la request)
+            appointment_data = {
+                'title': data['title'],
+                'appointmentStatus': data['appointmentStatus'],
+                'assignedUserId': data['assignedUserId'],
+                'calendarId': data['calendarId'],
+                'locationId': data['locationId'],
+                'contactId': data['contactId'],
+                'startTime': data['startTime'],
+                'endTime': data['endTime']
+            }
             
-            print(f"Creating appointment with data: {data}")
+            print(f"Creating appointment with data: {appointment_data}")
             print(f"URL: {appointments_url}")
             print(f"Headers: {headers}")
             
-            response = requests.post(appointments_url, headers=headers, json=data)
+            response = requests.post(appointments_url, headers=headers, json=appointment_data)
             
             print(f"Response status code: {response.status_code}")
             print(f"Response text: {response.text[:500]}...")
