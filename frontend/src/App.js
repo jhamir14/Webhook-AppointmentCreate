@@ -5,45 +5,88 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import "./index.css";
 
+//  Configuración de la API de GoHighLevel
+const GHL_API_BASE = "https://services.leadconnectorhq.com/";
+const GHL_PRIVATE_TOKEN = "pit-3ff13585-dab4-4acf-b61a-aacfcd8c29fb";
+const GHL_LOCATION_ID = "r3UrTfNuQviYjKT9vfVz";
+
 export default function App() {
   const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({ title: "", date: "", time: "" });
 
-  // 🔹 Cargar citas al iniciar
+  //  Cargar citas desde GHL al iniciar
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/appointments/")
-      .then((res) => res.json())
-      .then((data) => setEvents(data));
+    fetchEvents();
   }, []);
 
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch(
+        `${GHL_API_BASE}calendars/events?locationId=${GHL_LOCATION_ID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${GHL_PRIVATE_TOKEN}`,
+            "Content-Type": "application/json",
+            Version: "2021-07-28", // requerido por GHL
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Error al obtener citas de GHL");
+      const data = await res.json();
+
+      // Adaptar formato para FullCalendar
+      const formatted = data.events.map((event) => ({
+        id: event.id,
+        title: event.title || "Cita sin título",
+        start: event.startTime,
+        end: event.endTime,
+      }));
+
+      setEvents(formatted);
+    } catch (err) {
+      console.error(" Error cargando eventos:", err);
+    }
+  };
+
+  //  Manejar cambios en el formulario
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Guardar cita en el backend
+  //  Guardar cita en GHL
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const startTime = `${formData.date}T${formData.time}:00Z`; // UTC ISO
     const newEvent = {
+      calendarId: GHL_LOCATION_ID, // en GHL cada evento va en un calendario asociado
       title: formData.title,
-      start: `${formData.date}T${formData.time}`,
+      startTime,
+      endTime: startTime, // aquí puedes sumar 1h o 30min si quieres duración
     };
 
-    await fetch("http://127.0.0.1:8000/api/appointments/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newEvent),
-    });
+    try {
+      const res = await fetch(`${GHL_API_BASE}calendars/events`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GHL_PRIVATE_TOKEN}`,
+          "Content-Type": "application/json",
+          Version: "2021-07-28",
+        },
+        body: JSON.stringify(newEvent),
+      });
 
-    // Refrescar lista
-    fetch("http://127.0.0.1:8000/api/appointments/")
-      .then((res) => res.json())
-      .then((data) => setEvents(data));
+      if (!res.ok) throw new Error("Error al guardar cita en GHL");
 
-    setFormData({ title: "", date: "", time: "" });
+      await fetchEvents(); // refrescar lista
+      setFormData({ title: "", date: "", time: "" });
+    } catch (err) {
+      console.error(" Error creando cita:", err);
+    }
   };
 
-  // 🔹 Eliminar cita con click
+  // 🔹 Eliminar cita en GHL
   const handleEventClick = async (info) => {
     const confirmDelete = window.confirm(
       `¿Eliminar la cita "${info.event.title}"?`
@@ -52,19 +95,27 @@ export default function App() {
 
     const eventId = info.event.id;
 
-    await fetch(`http://127.0.0.1:8000/api/appointments/${eventId}/`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`${GHL_API_BASE}calendars/events/${eventId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${GHL_PRIVATE_TOKEN}`,
+          "Content-Type": "application/json",
+          Version: "2021-07-28",
+        },
+      });
 
-    // Refrescar lista
-    fetch("http://127.0.0.1:8000/api/appointments/")
-      .then((res) => res.json())
-      .then((data) => setEvents(data));
+      if (!res.ok) throw new Error("Error al eliminar cita en GHL");
+
+      await fetchEvents(); // refrescar lista
+    } catch (err) {
+      console.error(" Error eliminando cita:", err);
+    }
   };
 
   return (
     <div className="App">
-      <h1>Calendario de Citas</h1>
+      <h1> Calendario de Citas </h1>
 
       {/* Formulario */}
       <form onSubmit={handleSubmit} className="formulario">
