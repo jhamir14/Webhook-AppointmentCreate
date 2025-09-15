@@ -1,0 +1,413 @@
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.app-header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Contenedor principal */
+.app-container {
+  display: flex;
+  flex: 1;
+  min-height: calc(100vh - 80px);
+}
+
+/* Sidebar */
+.sidebar {
+  width: 350px;
+  background: white;
+  border-right: 1px solid #e1e5e9;
+  padding: 1.5rem;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar h2 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 0.5rem;
+}
+
+/* Lista de calendarios */
+.calendar-list {
+  margin-bottom: 1.5rem;
+}
+
+.calendar-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calendar-item:hover {
+  background: #edf2f7;
+  border-color: #667eea;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.calendar-item.selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.calendar-item h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: inherit;
+}
+
+.calendar-item p {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  opacity: 0.8;
+}
+
+/* Botón crear cita */
+.create-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.create-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.4);
+}
+
+/* Contenido principal */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Header del calendario */
+.calendar-header {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.calendar-header h2 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.calendar-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.calendar-details p {
+  background: #f7fafc;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  border-left: 3px solid #667eea;
+}
+
+/* Contenedor del calendario */
+.calendar-container {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+/* Pantalla de bienvenida */
+.welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  background: white;
+  border-radius: 12px;
+  padding: 3rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.welcome h2 {
+  color: #2d3748;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.welcome p {
+  color: #718096;
+  font-size: 1.1rem;
+  max-width: 400px;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-header h3 {
+  color: #2d3748;
+  font-size: 1.3rem;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #718096;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+/* Formulario de cita */
+.appointment-form {
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Acciones del formulario */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.form-actions button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.form-actions button[type="button"] {
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.form-actions button[type="button"]:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.form-actions button[type="submit"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.form-actions button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estados de carga y error */
+.error {
+  color: #e53e3e;
+  background: #fed7d7;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #feb2b2;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e1e5e9;
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .calendar-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+/* Estilos para FullCalendar */
+.fc {
+  font-family: inherit;
+}
+
+.fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+}
+
+.fc-button {
+  background: #667eea !important;
+  border-color: #667eea !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+.fc-button:hover {
+  background: #5a67d8 !important;
+  border-color: #5a67d8 !important;
+}
+
+.fc-button:focus {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+.fc-daygrid-event {
+  border-radius: 4px !important;
+  font-size: 0.85rem !important;
+}
+
+.fc-event-title {
+  font-weight: 500 !important;
+}

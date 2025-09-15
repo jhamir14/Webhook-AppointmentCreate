@@ -132,6 +132,9 @@ def calendario_create_api(request):
     elif request.method == 'POST':
         try:
             data = request.data
+            print(f"Received data: {data}")
+            print(f"Data type: {type(data)}")
+            print(f"Data keys: {list(data.keys()) if isinstance(data, dict) else 'Not a dict'}")
             
             # Validar campos requeridos
             required_fields = [
@@ -141,11 +144,17 @@ def calendario_create_api(request):
             ]
             
             missing_fields = [field for field in required_fields if field not in data or not data[field]]
+            print(f"Missing fields: {missing_fields}")
+            print(f"All field values: {[(field, data.get(field, 'MISSING')) for field in required_fields]}")
+            
             if missing_fields:
+                print(f"Validation failed - missing fields: {missing_fields}")
                 return Response({
                     'error': 'Missing required fields',
                     'missing_fields': missing_fields,
-                    'required_fields': required_fields
+                    'required_fields': required_fields,
+                    'received_data': data,
+                    'field_values': {field: data.get(field, 'MISSING') for field in required_fields}
                 }, status=status.HTTP_400_BAD_REQUEST)
             
             # Validar formato de appointmentStatus
@@ -157,8 +166,7 @@ def calendario_create_api(request):
                     'received': data['appointmentStatus']
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # URL para crear citas - probando con diferentes endpoints
-            # Primero intentamos con el endpoint de eventos
+            # URL para crear citas - probando diferentes endpoints de GoHighLevel
             appointments_url = "https://services.leadconnectorhq.com/calendars/events/appointments"
             
             # Headers con versión
@@ -181,10 +189,22 @@ def calendario_create_api(request):
             print(f"URL: {appointments_url}")
             print(f"Headers: {headers}")
             
-            response = requests.post(appointments_url, headers=headers, json=appointment_data)
+            # Integración real con GoHighLevel
+            print(f"Creating appointment with data: {appointment_data}")
+            print(f"URL: {appointments_url}")
+            print(f"Headers: {headers}")
             
-            print(f"Response status code: {response.status_code}")
-            print(f"Response text: {response.text[:500]}...")
+            try:
+                response = requests.post(appointments_url, headers=headers, json=appointment_data, timeout=30)
+                print(f"Response status code: {response.status_code}")
+                print(f"Response text: {response.text[:500]}...")
+            except requests.exceptions.RequestException as e:
+                print(f"Request failed: {str(e)}")
+                return Response({
+                    'error': f'Request failed: {str(e)}',
+                    'url': appointments_url,
+                    'headers': headers
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             if response.status_code in [200, 201]:
                 return Response(response.json(), status=status.HTTP_201_CREATED)
