@@ -138,7 +138,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>📅 Sistema de Gestión de Calendarios</h1>
+        <h1> Sistema de Gestión de Calendarios</h1>
       </header>
 
       <div className="app-container">
@@ -177,7 +177,7 @@ export default function App() {
           {selectedCalendar ? (
             <div>
               <div className="calendar-header">
-                <h2>📅 {selectedCalendar.name || 'Calendario'}</h2>
+                <h2> {selectedCalendar.name || 'Calendario'}</h2>
                 <div className="calendar-details">
                   <p><strong>ID:</strong> {selectedCalendar.id}</p>
                   <p><strong>Estado:</strong> {selectedCalendar.status || 'N/A'}</p>
